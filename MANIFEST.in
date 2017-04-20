@@ -1,0 +1,6 @@
+include README.md
+
+recursive-include hg_agent_periodic/templates *
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

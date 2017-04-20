@@ -1,0 +1,16 @@
+machine:
+  post:
+  - sudo pip install -U pip
+  services:
+  - docker
+
+dependencies:
+  pre:
+  - pip install flake8 mock coverage pyfakefs httmock
+
+test:
+  override:
+  - make test
+  - make lint
+  - make coverage
+  - cp -R htmlcov $CIRCLE_ARTIFACTS

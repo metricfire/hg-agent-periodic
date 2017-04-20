@@ -1,0 +1,6 @@
+#!/usr/bin/env python
+
+from hg_agent_periodic import periodic
+
+if __name__ == '__main__':
+    periodic.main()
