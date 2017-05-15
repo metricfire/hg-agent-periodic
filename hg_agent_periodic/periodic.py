@@ -170,8 +170,7 @@ def config_once(args):
         except:
             logging.exception('Writing & restarting: %s', args.diamond_config)
     else:
-        # No need to log the "happy path", but keep it for coverage & futures.
-        pass
+        logging.info('No change in Diamond configuration')
 
 
 def get_primary_ip():
