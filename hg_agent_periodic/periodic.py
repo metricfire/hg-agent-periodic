@@ -61,6 +61,11 @@ schema = {
             'format': 'uri',
             'description': 'An HTTPS proxy to use for `heartbeat` messages'
         },
+        'endpoint_url': {
+            'type': 'string',
+            'format': 'uri',
+            'description': 'HTTP API endpoint for metric forwarder'
+        }
     },
     'required': ['api_key',
                  'endpoint'],
