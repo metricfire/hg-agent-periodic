@@ -65,6 +65,23 @@ schema = {
             'type': 'string',
             'format': 'uri',
             'description': 'HTTP API endpoint for metric forwarder'
+        },
+        'tcp_port': {
+            'type': 'integer',
+            'description': "Port for TCP Metric Receiver to listen on"
+        },
+        'udp_port': {
+            'type': 'integer',
+            'description': "Port for UDP Metric Receiver to listen on"
+        },
+        'spool_rotatesize': {
+            'type': 'integer',
+            'description': "Max bytes for a spool file before\
+                            rotation for the metric receivers"
+        },
+        'max_spool_count': {
+            'type': 'integer',
+            'description': 'Max number of spool files to keep on disk'
         }
     },
     'required': ['api_key',
