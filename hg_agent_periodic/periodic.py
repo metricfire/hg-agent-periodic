@@ -76,7 +76,8 @@ schema = {
         },
         'spool_rotatesize': {
             'type': 'integer',
-            'description': "Max bytes for a spool file before rotation for the metric receivers"
+            'description': "Max bytes for a spool file before\
+                            rotation for the metric receivers"
         },
         'max_spool_count': {
             'type': 'integer',
