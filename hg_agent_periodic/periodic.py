@@ -82,6 +82,14 @@ schema = {
         'max_spool_count': {
             'type': 'integer',
             'description': 'Max number of spool files to keep on disk'
+        },
+        'max_batch_size': {
+            'type': 'integer',
+            'description': 'Max number of metrics to forward in a batch'
+        },
+        'batch_timeout': {
+            'type': 'integer',
+            'description': 'Max time to flush the current metric batch'
         }
     },
     'required': ['api_key',
