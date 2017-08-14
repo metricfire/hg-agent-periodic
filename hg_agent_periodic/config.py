@@ -22,8 +22,8 @@ def get_args(argv=None):
                         default='00000000-0000-0000-0000-000000000000',
                         help='Hosted Graphite API key.')
     parser.add_argument('--endpoint',
-                        default='carbon.hostedgraphite.com',
-                        help='Hosted Graphite Carbon endpoint.')
+                        default='localhost',
+                        help='HG Agent local Graphite endpoint.')
     args = parser.parse_args(args=argv)
     return args
 
