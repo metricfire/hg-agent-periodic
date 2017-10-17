@@ -90,7 +90,16 @@ schema = {
         'batch_timeout': {
             'type': 'integer',
             'description': 'Max time to flush the current metric batch'
-        }
+        },
+        'mongodb': {
+            'type': 'object',
+            'description': 'MongoDB collector configuration',
+            'properties': {
+                'enabled': {'type': 'boolean'},
+                'host': {'type': 'string'},
+                'port': {'type': 'integer'},
+            },
+        },
     },
     'required': ['api_key',
                  'endpoint'],
