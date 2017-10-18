@@ -107,7 +107,7 @@ schema = {
                 'simple': {'type': 'boolean'},
                 'translate_collections': {'type': 'boolean'},
                 'ssl': {'type': 'boolean'},
-                'replica' {'type': 'boolean'},
+                'replica': {'type': 'boolean'},
                 'replset_node_name': {'type': 'string'},
             },
         },
