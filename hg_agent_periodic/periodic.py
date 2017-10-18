@@ -90,7 +90,27 @@ schema = {
         'batch_timeout': {
             'type': 'integer',
             'description': 'Max time to flush the current metric batch'
-        }
+        },
+        'mongodb': {
+            'type': 'object',
+            'description': 'MongoDB collector configuration',
+            'properties': {
+                'enabled': {'type': 'boolean'},
+                'host': {'type': 'string'},
+                'port': {'type': 'integer'},
+                'user': {'type': 'string'},
+                'passwd': {'type': 'string'},
+                'databases': {'type': 'string'},
+                'ignore_collections': {'type': 'string'},
+                'collection_sample_rate': {'type': 'integer'},
+                'network_timeout': {'type': 'integer'},
+                'simple': {'type': 'boolean'},
+                'translate_collections': {'type': 'boolean'},
+                'ssl': {'type': 'boolean'},
+                'replica': {'type': 'boolean'},
+                'replset_node_name': {'type': 'string'},
+            },
+        },
     },
     'required': ['api_key',
                  'endpoint'],
@@ -119,7 +139,8 @@ def gen_diamond_config(context):
     '''Generate a `diamond` config from a `hg-agent` config.
     Uses templates/diamond.conf'''
     env = jinja2.Environment(loader=jinja2.PackageLoader('hg_agent_periodic',
-                                                         'templates'))
+                                                         'templates'),
+                             lstrip_blocks=True)
 
     def isoformat(value):
         return value.isoformat()
