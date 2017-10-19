@@ -33,13 +33,14 @@ def main():
     periodic.init_log('hg-agent-config', args.debug)
 
     try:
-        agent_config = {'api_key': args.api_key,
-                        'endpoint': args.endpoint,
-                        'mongodb': {
-                            'enabled': False,
-                            'host': 'localhost',
-                            'port': 27017,
-                        },
+        agent_config = {
+            'api_key': args.api_key,
+            'endpoint': args.endpoint,
+            'mongodb': {
+                'enabled': False,
+                'host': 'localhost',
+                'port': 27017,
+            },
         }
         periodic.validate_agent_config(agent_config)
         data = yaml.dump(agent_config, default_flow_style=False)
