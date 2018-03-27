@@ -111,6 +111,14 @@ schema = {
                 'replset_node_name': {'type': 'string'},
             },
         },
+        'custom_prefix': {
+            'type': 'string',
+            'description': 'A custom prefix for metrics, instead of "hg_agent"'
+        },
+        'hostname_method': {
+            'type': 'string',
+            'description': 'Method to use for hostnames, per Diamond config'
+        },
     },
     'required': ['api_key',
                  'endpoint'],
@@ -297,11 +305,13 @@ def heartbeat_once(args):
     logs = collect_logs(args.periodic_logfile)
     messages = '\n'.join(logs)
 
+    hostname_method = agent_config.get('hostname_method', 'smart')
+
     beat_data = {
         'key': agent_config['api_key'],
         'timestamp': int(time.time()),
         'version': version,
-        'hostname': diamond.collector.get_hostname({}, method='smart'),
+        'hostname': diamond.collector.get_hostname({}, method=hostname_method),
         'ip': get_primary_ip(),
         'platform': platform.platform(),
         'ok': 'ERROR' not in messages,
