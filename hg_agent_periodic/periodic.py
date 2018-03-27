@@ -226,7 +226,7 @@ def config_once(args):
             with open(args.diamond_config, 'w') as f:
                 f.write(new_diamond)
             restart_diamond(args)
-        except:
+        except BaseException:
             logging.exception('Writing & restarting: %s', args.diamond_config)
     else:
         logging.info('No change in Diamond configuration')
@@ -336,7 +336,7 @@ def periodic_task(func, args, interval, shutdown):
         if now >= next_run:
             try:
                 func(args)
-            except:
+            except BaseException:
                 logging.exception('Unhandled exception in %s', func.__name__)
             next_run = now + interval
         time.sleep(1)
