@@ -119,6 +119,11 @@ schema = {
             'type': 'string',
             'description': 'Method to use for hostnames, per Diamond config'
         },
+        'heartbeat_url': {
+            'type': 'string',
+            'format': 'uri',
+            'description': 'Endpoint for Hosted Graphite heartbeat service'
+        },
     },
     'required': ['api_key',
                  'endpoint'],
@@ -324,7 +329,8 @@ def heartbeat_once(args):
     else:
         proxies = None
 
-    send_heartbeat(args.heartbeat, beat_data, proxies=proxies)
+    heartbeat_url = agent_config.get('heartbeat_url', args.heartbeat)
+    send_heartbeat(heartbeat_url, beat_data, proxies=proxies)
 
 
 def periodic_task(func, args, interval, shutdown):
