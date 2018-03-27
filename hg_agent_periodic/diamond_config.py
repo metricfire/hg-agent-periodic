@@ -42,7 +42,7 @@ def main():
         logging.error('config in %s: %s', args.config, e)
     except (OSError, IOError) as e:
         logging.error('writing %s: %s', args.diamond_config, e)
-    except:
+    except Exception:
         logging.exception('unhandled exception')
 
 

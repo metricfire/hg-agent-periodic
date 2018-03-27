@@ -50,7 +50,7 @@ def main():
         logging.error('generating %s: %s', args.config, e)
     except (OSError, IOError) as e:
         logging.error('writing %s: %s', args.config, e)
-    except:
+    except Exception:
         logging.exception('unhandled exception')
 
 

@@ -123,6 +123,32 @@ class TestDiamondConfigGen(unittest.TestCase):
             'path_prefix = 00000000-0000-0000-0000-000000000000.hg_agent',
             lines)
 
+    def test_custom_prefix(self):
+        cfg = '''
+            api_key: "00000000-0000-0000-0000-000000000000"
+            endpoint: "localhost"
+            custom_prefix: "no_2_hg_agent"
+        '''
+        y = yaml.load(textwrap.dedent(cfg))
+        periodic.validate_agent_config(y)
+        diamond = periodic.gen_diamond_config(y)
+        lines = diamond.split('\n')
+        self.assertIn(
+            'path_prefix = 00000000-0000-0000-0000-000000000000.no_2_hg_agent',
+            lines)
+
+    def test_hostname_method(self):
+        cfg = '''
+            api_key: "00000000-0000-0000-0000-000000000000"
+            endpoint: "localhost"
+            hostname_method: "fqdn"
+        '''
+        y = yaml.load(textwrap.dedent(cfg))
+        periodic.validate_agent_config(y)
+        diamond = periodic.gen_diamond_config(y)
+        lines = diamond.split('\n')
+        self.assertIn('hostname_method = fqdn', lines)
+
     def test_generated_configs_differ(self):
         cfg1 = textwrap.dedent('''A line,
                                   a line we should ignore,

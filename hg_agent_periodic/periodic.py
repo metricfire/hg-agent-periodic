@@ -111,6 +111,19 @@ schema = {
                 'replset_node_name': {'type': 'string'},
             },
         },
+        'custom_prefix': {
+            'type': 'string',
+            'description': 'A custom prefix for metrics, instead of "hg_agent"'
+        },
+        'hostname_method': {
+            'type': 'string',
+            'description': 'Method to use for hostnames, per Diamond config'
+        },
+        'heartbeat_url': {
+            'type': 'string',
+            'format': 'uri',
+            'description': 'Endpoint for Hosted Graphite heartbeat service'
+        },
     },
     'required': ['api_key',
                  'endpoint'],
@@ -218,7 +231,7 @@ def config_once(args):
             with open(args.diamond_config, 'w') as f:
                 f.write(new_diamond)
             restart_diamond(args)
-        except:
+        except BaseException:
             logging.exception('Writing & restarting: %s', args.diamond_config)
     else:
         logging.info('No change in Diamond configuration')
@@ -297,11 +310,13 @@ def heartbeat_once(args):
     logs = collect_logs(args.periodic_logfile)
     messages = '\n'.join(logs)
 
+    hostname_method = agent_config.get('hostname_method', 'smart')
+
     beat_data = {
         'key': agent_config['api_key'],
         'timestamp': int(time.time()),
         'version': version,
-        'hostname': diamond.collector.get_hostname({}, method='smart'),
+        'hostname': diamond.collector.get_hostname({}, method=hostname_method),
         'ip': get_primary_ip(),
         'platform': platform.platform(),
         'ok': 'ERROR' not in messages,
@@ -314,7 +329,8 @@ def heartbeat_once(args):
     else:
         proxies = None
 
-    send_heartbeat(args.heartbeat, beat_data, proxies=proxies)
+    heartbeat_url = agent_config.get('heartbeat_url', args.heartbeat)
+    send_heartbeat(heartbeat_url, beat_data, proxies=proxies)
 
 
 def periodic_task(func, args, interval, shutdown):
@@ -326,7 +342,7 @@ def periodic_task(func, args, interval, shutdown):
         if now >= next_run:
             try:
                 func(args)
-            except:
+            except BaseException:
                 logging.exception('Unhandled exception in %s', func.__name__)
             next_run = now + interval
         time.sleep(1)
