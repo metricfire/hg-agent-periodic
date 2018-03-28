@@ -24,6 +24,12 @@ def get_args(argv=None):
     parser.add_argument('--endpoint',
                         default='localhost',
                         help='HG Agent local Graphite endpoint.')
+    parser.add_argument('--endpoint-url',
+                        default='',
+                        help='Hosted Graphite sink API endpoint.')
+    parser.add_argument('--heartbeat-url',
+                        default='',
+                        help='Hosted Graphite heartbeat metadata endpoint.')
     args = parser.parse_args(args=argv)
     return args
 
@@ -35,13 +41,12 @@ def main():
     try:
         agent_config = {
             'api_key': args.api_key,
-            'endpoint': args.endpoint,
-            'mongodb': {
-                'enabled': False,
-                'host': 'localhost',
-                'port': 27017,
-            },
         }
+        if args.endpoint_url:
+            agent_config['endpoint_url'] = args.endpoint_url
+        if args.heartbeat_url:
+            agent_config['heartbeat_url'] = args.heartbeat_url
+
         periodic.validate_agent_config(agent_config)
         data = yaml.dump(agent_config, default_flow_style=False)
         with open(args.config, 'w') as f:
