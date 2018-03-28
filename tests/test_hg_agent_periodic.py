@@ -176,6 +176,7 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
 
     def setUp(self):
         self.setUpPyfakefs()
+        periodic.remember_config({})
 
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.validate_agent_config')
@@ -199,7 +200,7 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         mock_logging.error.assert_called()
         mock_gen.assert_not_called()
 
-    @mock.patch('hg_agent_periodic.periodic.restart_diamond')
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_new_diamond(self, mock_gen, mock_restart):
 
@@ -215,9 +216,9 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         self.assertFalse(os.path.exists('/diamond.cfg'))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         self.assertTrue(os.path.exists('/diamond.cfg'))
-        mock_restart.assert_called()
+        mock_restart.assert_called_once_with(mock.ANY, 'diamond')
 
-    @mock.patch('hg_agent_periodic.periodic.restart_diamond')
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_diamond_unchanged(self, mock_gen, mock_restart):
 
@@ -233,8 +234,72 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_not_called()
 
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_no_endpoint_url(self, mock_gen, mock_restart):
+        '''The forwarder is not restarted without `endpoint_url`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_once_with(mock.ANY, 'diamond')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_unchanged_endpoint_url(self, mock_gen, mock_restart):
+        '''The forwarder is not restarted with unchanged `endpoint_url`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                               endpoint_url: "https://my-endpoint"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_once_with(mock.ANY, 'diamond')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_changed_endpoint_url(self, mock_gen, mock_restart):
+        '''The forwarder is restarted with changed `endpoint_url`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                               endpoint_url: "https://my-endpoint"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        config = self.fs.get_object('/hg-agent.cfg')
+        config.set_contents(textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                               endpoint_url: "https://other-endpoint"
+                            '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_with(mock.ANY, 'forwarder')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_new_endpoint_url(self, mock_gen, mock_restart):
+        '''The forwarder is restarted with an entirely new `endpoint_url`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        config = self.fs.get_object('/hg-agent.cfg')
+        config.set_contents(textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                               endpoint_url: "https://my-endpoint"
+                            '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_with(mock.ANY, 'forwarder')
+
     @mock.patch('hg_agent_periodic.periodic.logging')
-    @mock.patch('hg_agent_periodic.periodic.restart_diamond')
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_write_except(self, mock_gen, mock_restart, mock_logging):
         mock_gen.return_value = 'a fake diamond config\n'
