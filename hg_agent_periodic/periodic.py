@@ -54,7 +54,7 @@ schema = {
         'endpoint': {
             'type': 'string',
             'format': 'hostname',
-            'description': 'The user\'s HG carbon endpoint'
+            'description': 'Carbon endpoint for Diamond to send metrics to'
         },
         'https_proxy': {
             'type': 'string',
@@ -64,7 +64,7 @@ schema = {
         'endpoint_url': {
             'type': 'string',
             'format': 'uri',
-            'description': 'HTTP API endpoint for metric forwarder'
+            'description': 'HTTP API endpoint for metric forwarding to HG'
         },
         'tcp_port': {
             'type': 'integer',
@@ -125,8 +125,7 @@ schema = {
             'description': 'Endpoint for Hosted Graphite heartbeat service'
         },
     },
-    'required': ['api_key',
-                 'endpoint'],
+    'required': ['api_key'],
     'additionalProperties': False
 }
 

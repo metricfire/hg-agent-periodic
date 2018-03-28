@@ -31,7 +31,6 @@ class TestConfigSchema(unittest.TestCase):
     def test_ok(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "a.carbon.endpoint"
         '''
         y = yaml.load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
@@ -39,7 +38,6 @@ class TestConfigSchema(unittest.TestCase):
     def test_ok_proxy(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "a.carbon.endpoint"
             https_proxy: "http://10.10.1.10:1080"
         '''
         y = yaml.load(textwrap.dedent(cfg))
@@ -48,7 +46,6 @@ class TestConfigSchema(unittest.TestCase):
     def test_unknown_key(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "a.carbon.endpoint"
             something: "whatever"
         '''
         y = yaml.load(textwrap.dedent(cfg))
@@ -58,7 +55,6 @@ class TestConfigSchema(unittest.TestCase):
 
     def test_missing_required_key(self):
         cfg = '''
-            api_key: "00000000-0000-0000-0000-000000000000"
         '''
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
@@ -68,7 +64,6 @@ class TestConfigSchema(unittest.TestCase):
     def test_bad_api_key(self):
         cfg = '''
             api_key: "not a uuidv4"
-            endpoint: "a.carbon.endpoint"
         '''
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
@@ -85,10 +80,19 @@ class TestConfigSchema(unittest.TestCase):
             periodic.validate_agent_config(y)
         print cm.exception.message
 
+    def test_bad_endpoint_url(self):
+        cfg = '''
+            api_key: "00000000-0000-0000-0000-000000000000"
+            endpoint_url: "not a URL"
+        '''
+        y = yaml.load(textwrap.dedent(cfg))
+        with self.assertRaises(periodic.ValidationError) as cm:
+            periodic.validate_agent_config(y)
+        print cm.exception.message
+
     def test_bad_proxy(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "a.carbon.endpoint"
             https_proxy: "not a proxy URI"
         '''
         y = yaml.load(textwrap.dedent(cfg))
@@ -112,13 +116,12 @@ class TestDiamondConfigGen(unittest.TestCase):
     def test_gen(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "a.carbon.endpoint"
         '''
         y = yaml.load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
-        self.assertIn('host = a.carbon.endpoint', lines)
+        self.assertIn('host = localhost', lines)
         self.assertIn(
             'path_prefix = 00000000-0000-0000-0000-000000000000.hg_agent',
             lines)
@@ -126,7 +129,6 @@ class TestDiamondConfigGen(unittest.TestCase):
     def test_custom_prefix(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "localhost"
             custom_prefix: "no_2_hg_agent"
         '''
         y = yaml.load(textwrap.dedent(cfg))
@@ -140,7 +142,6 @@ class TestDiamondConfigGen(unittest.TestCase):
     def test_hostname_method(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
-            endpoint: "localhost"
             hostname_method: "fqdn"
         '''
         y = yaml.load(textwrap.dedent(cfg))
@@ -209,7 +210,6 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
                                api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint: "a.carbon.endpoint"
                            '''))
 
         self.assertFalse(os.path.exists('/diamond.cfg'))
@@ -228,7 +228,6 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
                                api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint: "a.carbon.endpoint"
                            '''))
 
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
@@ -244,7 +243,6 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
                                api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint: "a.carbon.endpoint"
                            '''))
 
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
@@ -339,7 +337,6 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
                                api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint: "a.carbon.endpoint"
                            '''))
         args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log',
                              'endpoint')
@@ -355,7 +352,6 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
                                api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint: "a.carbon.endpoint"
                            '''))
         self.fs.CreateFile('/version', contents='0.1\n')
         data = ['line %.02d' % i for i in range(20)]
