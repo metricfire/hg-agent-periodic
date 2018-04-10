@@ -178,8 +178,8 @@ def generated_configs_differ(new, old, ignore='Generated'):
     return new_lines != old_lines
 
 
-def restart_diamond(args):
-    '''Restart the diamond process under Supervisor.'''
+def restart_process(args, process):
+    '''Restart a process under Supervisor.'''
 
     # NB: this prints out the usual supervisor stop/start to stdout, but
     # that's a small price to pay for the simplicity of just invoking
@@ -193,7 +193,7 @@ def restart_diamond(args):
     options = supervisorctl.ClientOptions()
     options.realize(['--configuration', args.supervisor_config])
     controller = supervisorctl.Controller(options)
-    controller.onecmd('restart diamond')
+    controller.onecmd('restart %s' % process)
 
 
 def load_config(source, filename):
@@ -212,11 +212,27 @@ def load_config(source, filename):
     return agent_config
 
 
+# Keep track of config values that may change between iterations of
+# `config_once` (requiring action). We could make `config_once` a callable
+# object & track it there, but this is somewhat simpler for now.
+old_config = {}
+
+
+def remember_config(new):
+    '''Update the module-global config with `new`'''
+    old_config.clear()
+    old_config.update(new)
+
+
 def config_once(args):
     '''Load config, gen diamond config, and restart diamond if changed.'''
     agent_config = load_config('config', args.config)
     if agent_config is None:
         return
+
+    if old_config:
+        if old_config.get('endpoint_url') != agent_config.get('endpoint_url'):
+            restart_process(args, 'forwarder')
 
     new_diamond = gen_diamond_config(agent_config)
     try:
@@ -229,11 +245,13 @@ def config_once(args):
         try:
             with open(args.diamond_config, 'w') as f:
                 f.write(new_diamond)
-            restart_diamond(args)
+            restart_process(args, 'diamond')
         except BaseException:
             logging.exception('Writing & restarting: %s', args.diamond_config)
     else:
         logging.info('No change in Diamond configuration')
+
+    remember_config(agent_config)
 
 
 def get_primary_ip():
