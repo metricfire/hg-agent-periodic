@@ -237,8 +237,10 @@ def config_once(args):
     if old_config:
         if (config_changed(old_config, agent_config, 'endpoint_url') or
                 config_changed(old_config, agent_config, 'api_key')):
-            logging.info('Forwarder configuration changed, restarting.')
+            logging.info('Forwarder/receiver configuration changed, '
+                         'restarting.')
             restart_process(args, 'forwarder')
+            restart_process(args, 'receiver')
 
     new_diamond = gen_diamond_config(agent_config)
     try:
