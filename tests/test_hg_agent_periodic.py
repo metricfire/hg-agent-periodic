@@ -282,6 +282,36 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
 
     @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_unchanged_api_key(self, mock_gen, mock_restart):
+        '''The forwarder is not restarted with unchanged `api_key`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_once_with(mock.ANY, 'diamond')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_changed_api_key(self, mock_gen, mock_restart):
+        '''The forwarder is restarted with changed `api_key`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        config = self.fs.get_object('/hg-agent.cfg')
+        config.set_contents(textwrap.dedent('''
+                               api_key: "10000000-0000-0000-0000-000000000001"
+                            '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_with(mock.ANY, 'forwarder')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_new_endpoint_url(self, mock_gen, mock_restart):
         '''The forwarder is restarted with an entirely new `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
