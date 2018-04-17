@@ -123,7 +123,7 @@ class TestDiamondConfigGen(unittest.TestCase):
         lines = diamond.split('\n')
         self.assertIn('host = localhost', lines)
         self.assertIn(
-            'path_prefix = 00000000-0000-0000-0000-000000000000.hg_agent',
+            'path_prefix = hg_agent',
             lines)
 
     def test_custom_prefix(self):
@@ -136,7 +136,7 @@ class TestDiamondConfigGen(unittest.TestCase):
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
         self.assertIn(
-            'path_prefix = 00000000-0000-0000-0000-000000000000.no_2_hg_agent',
+            'path_prefix = no_2_hg_agent',
             lines)
 
     def test_hostname_method(self):
