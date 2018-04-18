@@ -123,7 +123,7 @@ class TestDiamondConfigGen(unittest.TestCase):
         lines = diamond.split('\n')
         self.assertIn('host = localhost', lines)
         self.assertIn(
-            'path_prefix = 00000000-0000-0000-0000-000000000000.hg_agent',
+            'path_prefix = hg_agent',
             lines)
 
     def test_custom_prefix(self):
@@ -136,7 +136,7 @@ class TestDiamondConfigGen(unittest.TestCase):
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
         self.assertIn(
-            'path_prefix = 00000000-0000-0000-0000-000000000000.no_2_hg_agent',
+            'path_prefix = no_2_hg_agent',
             lines)
 
     def test_hostname_method(self):
@@ -264,7 +264,7 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_changed_endpoint_url(self, mock_gen, mock_restart):
-        '''The forwarder is restarted with changed `endpoint_url`'''
+        '''The forwarder/receiver are restarted with changed `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
         self.fs.CreateFile('/hg-agent.cfg',
                            contents=textwrap.dedent('''
@@ -278,7 +278,39 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
                                endpoint_url: "https://other-endpoint"
                             '''))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
-        mock_restart.assert_called_with(mock.ANY, 'forwarder')
+        mock_restart.assert_any_call(mock.ANY, 'forwarder')
+        mock_restart.assert_any_call(mock.ANY, 'receiver')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_unchanged_api_key(self, mock_gen, mock_restart):
+        '''The forwarder is not restarted with unchanged `api_key`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_called_once_with(mock.ANY, 'diamond')
+
+    @mock.patch('hg_agent_periodic.periodic.restart_process')
+    @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
+    def test_config_changed_api_key(self, mock_gen, mock_restart):
+        '''The forwarder/receiver are restarted with changed `api_key`'''
+        mock_gen.return_value = 'a fake diamond config\n'
+        self.fs.CreateFile('/hg-agent.cfg',
+                           contents=textwrap.dedent('''
+                               api_key: "00000000-0000-0000-0000-000000000000"
+                           '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        config = self.fs.get_object('/hg-agent.cfg')
+        config.set_contents(textwrap.dedent('''
+                               api_key: "10000000-0000-0000-0000-000000000001"
+                            '''))
+        periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
+        mock_restart.assert_any_call(mock.ANY, 'forwarder')
+        mock_restart.assert_any_call(mock.ANY, 'receiver')
 
     @mock.patch('hg_agent_periodic.periodic.restart_process')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
@@ -296,7 +328,7 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
                                endpoint_url: "https://my-endpoint"
                             '''))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
-        mock_restart.assert_called_with(mock.ANY, 'forwarder')
+        mock_restart.assert_any_call(mock.ANY, 'forwarder')
 
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.restart_process')
