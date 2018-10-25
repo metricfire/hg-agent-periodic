@@ -115,6 +115,10 @@ schema = {
             'type': 'string',
             'description': 'A custom prefix for metrics, instead of "hg_agent"'
         },
+        'hostname': {
+            'type': 'string',
+            'description': 'If hostname_method is set to None, use this static hostname'
+        },
         'hostname_method': {
             'type': 'string',
             'description': 'Method to use for hostnames, per Diamond config'
@@ -336,12 +340,16 @@ def heartbeat_once(args):
     messages = '\n'.join(logs)
 
     hostname_method = agent_config.get('hostname_method', 'smart')
+    if hostname_method == 'None':
+        hostname = agent_config.get('hostname', 'hg-agent')
+    else:
+        hostname = diamond.collector.get_hostname({}, method=hostname_method),
 
     beat_data = {
         'key': agent_config['api_key'],
         'timestamp': int(time.time()),
         'version': version,
-        'hostname': diamond.collector.get_hostname({}, method=hostname_method),
+        'hostname': hostname,
         'ip': get_primary_ip(),
         'platform': platform.platform(),
         'ok': 'ERROR' not in messages,
