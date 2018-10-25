@@ -117,7 +117,8 @@ schema = {
         },
         'hostname': {
             'type': 'string',
-            'description': 'If hostname_method is set to None, use this static hostname'
+            'description': ('If hostname_method is set to None, use this '
+                            'static hostname')
         },
         'hostname_method': {
             'type': 'string',
