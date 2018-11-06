@@ -124,6 +124,30 @@ schema = {
             'format': 'uri',
             'description': 'Endpoint for Hosted Graphite heartbeat service'
         },
+        'CPUCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable CPU Collector'
+        },
+        'DiskSpaceCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable DiskSpaceCollector'
+        },
+        'DiskUsageCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable Disk Usage Collector'
+        },
+        'LoadAverageCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable DiskSpaceCollector'
+        },
+        'MemoryCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable Memory Collector'
+        },
+        'NetworkCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable Memory Collector'
+        }
     },
     'required': ['api_key'],
     'additionalProperties': False
