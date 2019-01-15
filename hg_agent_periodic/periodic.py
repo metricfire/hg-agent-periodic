@@ -147,6 +147,18 @@ schema = {
         'NetworkCollector': {
             'type': 'boolean',
             'description': 'enable/disable Memory Collector'
+        },
+        'SockstatCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable Sockstat Collector'
+        },
+        'VMStatCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable VMStat Collector'
+        },
+        'SelfCollector': {
+            'type': 'boolean',
+            'description': 'enable/disable Self Collector'
         }
     },
     'required': ['api_key'],
