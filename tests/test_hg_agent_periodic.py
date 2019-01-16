@@ -150,6 +150,77 @@ class TestDiamondConfigGen(unittest.TestCase):
         lines = diamond.split('\n')
         self.assertIn('hostname_method = fqdn', lines)
 
+    def test_single_collector_deactivation(self):
+        cfg = '''
+            api_key: "00000000-0000-0000-0000-000000000000"
+            CPUCollector: False
+        '''
+        y = yaml.load(textwrap.dedent(cfg))
+        periodic.validate_agent_config(y)
+        diamond = periodic.gen_diamond_config(y)
+        lines = diamond.split('\n')
+        for i, line in enumerate(lines):
+            if "CPUCollector" in line:
+                collectorEnabled = lines[i+1]
+                self.assertEqual('enabled = False', collectorEnabled)
+
+    def test_multiple_collector_deactivation(self):
+        cfg = '''
+            api_key: "00000000-0000-0000-0000-000000000000"
+            CPUCollector: False
+            DiskSpaceCollector: False
+            DiskUsageCollector: False
+            LoadAverageCollector: False
+            MemoryCollector: False
+            NetworkCollector: False
+            SockstatCollector: False
+            VMStatCollector: False
+            SelfCollector: False
+        '''
+        collectors = ('CPUCollector',
+            'DiskSpaceCollector',
+            'DiskUsageCollector',
+            'LoadAverageCollector',
+            'MemoryCollector',
+            'NetworkCollector',
+            'SockstatCollector',
+            'VMStatCollector',
+            'SelfCollector')
+        y = yaml.load(textwrap.dedent(cfg))
+        periodic.validate_agent_config(y)
+        diamond = periodic.gen_diamond_config(y)
+        lines = diamond.split('\n')
+        for i, line in enumerate(lines):
+            for collector in collectors:
+                if collector in line:
+                    collectorEnabled = lines[i+1]
+                    self.assertEqual('enabled = False', collectorEnabled)
+
+    def test_collectors_activated_and_deactivated(self):
+        cfg = 'api_key: "00000000-0000-0000-0000-000000000000"'
+        collectorstates = {
+            'CPUCollector':'True',
+            'DiskSpaceCollector':'False',
+            'DiskUsageCollector':'True',
+            'LoadAverageCollector':'False',
+            'MemoryCollector':'False',
+            'NetworkCollector':'True',
+            'SockstatCollector':'False',
+            'VMStatCollector':'True',
+            'SelfCollector':'False',
+        }
+        for c in collectorstates:
+            cfg += ("\n%s: %s\n" % (c, collectorstates[c]))
+        y = yaml.load(textwrap.dedent(cfg))
+        periodic.validate_agent_config(y)
+        diamond = periodic.gen_diamond_config(y)
+        lines = diamond.split('\n')
+        for i, line in enumerate(lines):
+            for collector in collectorstates:
+                if collector in line:
+                    collectorEnabled = lines[i+1]
+                    self.assertEqual('enabled = %s' % collectorstates[collector], collectorEnabled)
+
     def test_generated_configs_differ(self):
         cfg1 = textwrap.dedent('''A line,
                                   a line we should ignore,
