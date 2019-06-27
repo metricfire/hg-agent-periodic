@@ -1,0 +1,12 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: hostedgraphite/pythonbuild:2venv
+    steps:
+      - checkout
+      - run: pip install flake8
+      - run: make test
+      - run: make lint
+      - run: make coverage
+      - run: cp -R htmlcov $CIRCLE_ARTIFACTS
