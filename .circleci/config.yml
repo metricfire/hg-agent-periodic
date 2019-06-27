@@ -5,7 +5,7 @@ jobs:
       - image: hostedgraphite/pythonbuild:2venv
     steps:
       - checkout
-      - run: pip install flake8 coverage
+      - run: pip install flake8 coverage httmock mock pyfakefs
       - run: make test
       - run: make lint
       - run: make coverage
