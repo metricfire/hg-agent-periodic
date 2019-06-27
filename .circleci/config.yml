@@ -10,4 +10,5 @@ jobs:
       - run: pip install flake8 coverage httmock mock pyfakefs
       - run: make lint
       - run: make coverage
-      - run: cp -R htmlcov $CIRCLE_ARTIFACTS
+      - store_artifacts:
+          path: htmlcov
