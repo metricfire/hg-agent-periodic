@@ -5,13 +5,13 @@ from setuptools import setup, find_packages
 
 requirements = [
     'diamond==4.0.451',
-    'jinja2==2.9.5',
+    'jinja2==2.10.1',
     'jsonschema==2.6.0',
-    'requests==2.13.0',
+    'requests==2.22.0',
     'rfc3987==1.3.7',  # For 'uri' format validation in jsonschema
     'supervisor==3.3.1',
     'tailer==0.4.1',
-    'PyYAML==3.12',
+    'PyYAML==5.1.1',
     'wheel',
 ]
 
@@ -27,7 +27,7 @@ dependency_links = [
 
 setup(
     name='hg-agent-periodic',
-    version='1.0.0',
+    version='1.1.0',
     description='Periodic tasks script for the Hosted Graphite agent.',
     long_description='Periodic tasks script for the Hosted Graphite agent.',
     author='Metricfire',

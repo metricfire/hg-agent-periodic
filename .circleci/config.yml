@@ -1,0 +1,14 @@
+version: 2.0
+jobs:
+  build:
+    docker:
+      - image: hostedgraphite/pythonbuild:2venv
+    steps:
+      - checkout
+      - run: make install
+      - run: make test
+      - run: pip install flake8 coverage httmock mock pyfakefs
+      - run: make lint
+      - run: make coverage
+      - store_artifacts:
+          path: htmlcov
