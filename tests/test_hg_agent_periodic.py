@@ -177,15 +177,16 @@ class TestDiamondConfigGen(unittest.TestCase):
             VMStatCollector: False
             SelfCollector: False
         '''
-        collectors = ('CPUCollector',
-                'DiskSpaceCollector',
-                'DiskUsageCollector',
-                'LoadAverageCollector',
-                'MemoryCollector',
-                'NetworkCollector',
-                'SockstatCollector',
-                'VMStatCollector',
-                'SelfCollector')
+        collectors = (
+            'CPUCollector',
+            'DiskSpaceCollector',
+            'DiskUsageCollector',
+            'LoadAverageCollector',
+            'MemoryCollector',
+            'NetworkCollector',
+            'SockstatCollector',
+            'VMStatCollector',
+            'SelfCollector')
         y = yaml.load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
@@ -219,7 +220,9 @@ class TestDiamondConfigGen(unittest.TestCase):
             for collector in collectorstates:
                 if collector in line:
                     collectorEnabled = lines[i+1]
-                    self.assertEqual('enabled = %s' % collectorstates[collector], collectorEnabled)
+                    self.assertEqual(
+                        'enabled = %s' % collectorstates[collector], 
+                        collectorEnabled)
 
     def test_generated_configs_differ(self):
         cfg1 = textwrap.dedent('''A line,
