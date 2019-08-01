@@ -178,14 +178,14 @@ class TestDiamondConfigGen(unittest.TestCase):
             SelfCollector: False
         '''
         collectors = ('CPUCollector',
-            'DiskSpaceCollector',
-            'DiskUsageCollector',
-            'LoadAverageCollector',
-            'MemoryCollector',
-            'NetworkCollector',
-            'SockstatCollector',
-            'VMStatCollector',
-            'SelfCollector')
+                'DiskSpaceCollector',
+                'DiskUsageCollector',
+                'LoadAverageCollector',
+                'MemoryCollector',
+                'NetworkCollector',
+                'SockstatCollector',
+                'VMStatCollector',
+                'SelfCollector')
         y = yaml.load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
@@ -199,15 +199,15 @@ class TestDiamondConfigGen(unittest.TestCase):
     def test_collectors_activated_and_deactivated(self):
         cfg = 'api_key: "00000000-0000-0000-0000-000000000000"'
         collectorstates = {
-            'CPUCollector':'True',
-            'DiskSpaceCollector':'False',
-            'DiskUsageCollector':'True',
-            'LoadAverageCollector':'False',
-            'MemoryCollector':'False',
-            'NetworkCollector':'True',
-            'SockstatCollector':'False',
-            'VMStatCollector':'True',
-            'SelfCollector':'False',
+            'CPUCollector': 'True',
+            'DiskSpaceCollector': 'False',
+            'DiskUsageCollector': 'True',
+            'LoadAverageCollector': 'False',
+            'MemoryCollector': 'False',
+            'NetworkCollector': 'True',
+            'SockstatCollector': 'False',
+            'VMStatCollector': 'True',
+            'SelfCollector': 'False',
         }
         for c in collectorstates:
             cfg += ("\n%s: %s\n" % (c, collectorstates[c]))
