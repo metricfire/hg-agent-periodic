@@ -221,7 +221,7 @@ class TestDiamondConfigGen(unittest.TestCase):
                 if collector in line:
                     collectorEnabled = lines[i+1]
                     self.assertEqual(
-                        'enabled = %s' % collectorstates[collector], 
+                        'enabled = %s' % collectorstates[collector],
                         collectorEnabled)
 
     def test_generated_configs_differ(self):
