@@ -11,7 +11,7 @@ requirements = [
     'rfc3987==1.3.7',  # For 'uri' format validation in jsonschema
     'supervisor==3.3.1',
     'tailer==0.4.1',
-    'PyYAML==5.1.1',
+    'PyYAML==5.4',
     'wheel',
 ]
 
