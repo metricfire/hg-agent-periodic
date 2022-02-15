@@ -36,7 +36,7 @@ lint:
 	flake8 bin/* hg_agent_periodic tests
 
 test:
-	python2 setup.py test
+	tox
 
 coverage:
 	coverage run --source hg_agent_periodic -m unittest discover -s tests
