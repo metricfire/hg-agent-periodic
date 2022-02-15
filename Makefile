@@ -36,7 +36,7 @@ lint:
 	flake8 bin/* hg_agent_periodic tests
 
 test:
-	python setup.py test
+	python2 setup.py test
 
 coverage:
 	coverage run --source hg_agent_periodic -m unittest discover -s tests
@@ -44,12 +44,12 @@ coverage:
 	coverage html
 
 release: clean
-	python setup.py --command-packages=stdeb.command sdist_dsc bdist_deb
+	python2 setup.py --command-packages=stdeb.command sdist_dsc bdist_deb
 
 dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python2 setup.py sdist
+	python2 setup.py bdist_wheel
 	ls -l dist
 
 install: clean
-	python setup.py install
+	python2 setup.py install
