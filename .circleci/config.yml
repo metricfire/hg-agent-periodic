@@ -9,7 +9,6 @@ jobs:
       - run: apt-get install libcurl4-openssl-dev libssl-dev -y
       - run: make install
       - run: make test
-      - run: pip install flake8 coverage httmock mock pyfakefs
       - run: make lint
       - run: make coverage
       - store_artifacts:
