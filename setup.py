@@ -15,16 +15,6 @@ requirements = [
     'wheel',
 ]
 
-test_requirements = [
-    'httmock',
-    'pyfakefs',
-    'coverage',
-    'mock',
-]
-
-dependency_links = [
-]
-
 setup(
     name='hg-agent-periodic',
     version='1.1.0',
@@ -41,8 +31,6 @@ setup(
         'bin/hg-agent-diamond-config',
     ],
     install_requires=requirements,
-    dependency_links=dependency_links,
-    tests_require=test_requirements,
     test_suite='tests',
     include_package_data=True,
     zip_safe=False,
