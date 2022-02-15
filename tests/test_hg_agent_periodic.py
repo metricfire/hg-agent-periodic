@@ -26,7 +26,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load('bare string')
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_ok(self):
         cfg = '''
@@ -51,7 +51,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_missing_required_key(self):
         cfg = '''
@@ -59,7 +59,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_bad_api_key(self):
         cfg = '''
@@ -68,7 +68,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_bad_endpoint(self):
         cfg = '''
@@ -78,7 +78,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_bad_endpoint_url(self):
         cfg = '''
@@ -88,7 +88,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_bad_proxy(self):
         cfg = '''
@@ -98,7 +98,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
     def test_spelling(self):
         cfg = '''
@@ -108,7 +108,7 @@ class TestConfigSchema(unittest.TestCase):
         y = yaml.load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception.message)
 
 
 class TestDiamondConfigGen(unittest.TestCase):
