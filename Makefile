@@ -52,4 +52,4 @@ dist: clean
 	ls -l dist
 
 install: clean
-	python2 setup.py install
+	pip install .
