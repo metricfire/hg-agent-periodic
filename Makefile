@@ -33,7 +33,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8
+	flake8 bin hg_agent_periodic tests setup.py
 
 test:
 	tox
