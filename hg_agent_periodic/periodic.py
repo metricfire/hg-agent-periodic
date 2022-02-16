@@ -136,8 +136,7 @@ def validate_agent_config(data):
     'silently' (i.e. return None) if validation succeeds.
     '''
     try:
-        jsonschema.validate(data, schema,
-                            format_checker=jsonschema.FormatChecker())
+        jsonschema.validate(data, schema, format_checker=jsonschema.FormatChecker())
     except jsonschema.ValidationError as e:
         raise ValidationError(e.message)
 
@@ -150,9 +149,7 @@ def validate_agent_config(data):
 def gen_diamond_config(context):
     '''Generate a `diamond` config from a `hg-agent` config.
     Uses templates/diamond.conf'''
-    env = jinja2.Environment(loader=jinja2.PackageLoader('hg_agent_periodic',
-                                                         'templates'),
-                             lstrip_blocks=True)
+    env = jinja2.Environment(loader=jinja2.PackageLoader('hg_agent_periodic', 'templates'), lstrip_blocks=True)
 
     def isoformat(value):
         return value.isoformat()
@@ -201,7 +198,7 @@ def load_config(source, filename):
     Log stating `source` of the error if there's a problem.'''
     try:
         data = load_file(filename)
-        agent_config = yaml.load(data)
+        agent_config = yaml.safe_load(data)
         validate_agent_config(agent_config)
     except LoadFileError as e:
         logging.error('%s loading %s: %s', source, filename, e)
@@ -237,8 +234,7 @@ def config_once(args):
     if old_config:
         if (config_changed(old_config, agent_config, 'endpoint_url') or
                 config_changed(old_config, agent_config, 'api_key')):
-            logging.info('Forwarder/receiver configuration changed, '
-                         'restarting.')
+            logging.info('Forwarder/receiver configuration changed, restarting.')
             restart_process(args, 'forwarder')
             restart_process(args, 'receiver')
 
@@ -381,8 +377,7 @@ def init_log(name, debug):
     else:
         logger.setLevel(logging.INFO)
     handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter(
-        '%(asctime)s ' + name + '[%(process)d] %(levelname)s %(message)s'))
+    handler.setFormatter(logging.Formatter('%(asctime)s ' + name + '[%(process)d] %(levelname)s %(message)s'))
     logger.addHandler(handler)
 
 
@@ -403,28 +398,31 @@ def get_args(argv=None):
     '''Parse out and returns script args.'''
     description = 'Periodic tasks script for the Hosted Graphite agent.'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Use debug logging.')
-    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf',
-                        help='Path to overall hg-agent config.')
-    parser.add_argument('--agent-version', default='/opt/hg-agent/version',
-                        help='Path to hg-agent version file.')
-    parser.add_argument('--supervisor-config',
-                        default='/etc/opt/hg-agent/supervisor.conf',
-                        help='Path to supervisor config.')
-    parser.add_argument('--diamond-config',
-                        default='/var/opt/hg-agent/diamond.conf',
-                        help='Path to managed diamond config.')
-    parser.add_argument('--heartbeat',
-                        default='https://heartbeat.hostedgraphite.com/beat',
-                        help='URI for Hosted Graphite heartbeat service.')
-    parser.add_argument('--periodic-logfile',
-                        default='/var/log/hg-agent/periodic.log',
-                        help='Path to logs of this process (via supervisord).')
-    parser.add_argument('--config-interval', type=int, default=10,
-                        help='Seconds between config check & update.')
-    parser.add_argument('--heartbeat-interval', type=int, default=60,
-                        help='Seconds between heartbeats.')
+    parser.add_argument('--debug', action='store_true', default=False, help='Use debug logging.')
+    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf', help='Path to overall hg-agent config.')
+    parser.add_argument('--agent-version', default='/opt/hg-agent/version', help='Path to hg-agent version file.')
+    parser.add_argument(
+        '--supervisor-config',
+        default='/etc/opt/hg-agent/supervisor.conf',
+        help='Path to supervisor config.'
+    )
+    parser.add_argument(
+        '--diamond-config',
+        default='/var/opt/hg-agent/diamond.conf',
+        help='Path to managed diamond config.'
+    )
+    parser.add_argument(
+        '--heartbeat',
+        default='https://heartbeat.hostedgraphite.com/beat',
+        help='URI for Hosted Graphite heartbeat service.'
+    )
+    parser.add_argument(
+        '--periodic-logfile',
+        default='/var/log/hg-agent/periodic.log',
+        help='Path to logs of this process (via supervisord).'
+    )
+    parser.add_argument('--config-interval', type=int, default=10, help='Seconds between config check & update.')
+    parser.add_argument('--heartbeat-interval', type=int, default=60, help='Seconds between heartbeats.')
     args = parser.parse_args(args=argv)
     return args
 
@@ -438,12 +436,14 @@ def main():
     config = threading.Thread(
         target=periodic_task,
         name='hg-agent-periodic.config_manager',
-        args=(config_once, args, args.config_interval, shutdown))
+        args=(config_once, args, args.config_interval, shutdown)
+    )
 
     heartbeat = threading.Thread(
         target=periodic_task,
         name='hg-agent-periodic.heartbeat_manager',
-        args=(heartbeat_once, args, args.heartbeat_interval, shutdown))
+        args=(heartbeat_once, args, args.heartbeat_interval, shutdown)
+    )
 
     threads = [config, heartbeat]
 
