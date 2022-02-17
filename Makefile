@@ -33,7 +33,7 @@ clean-test:
 	rm -fr htmlcov/
 
 lint:
-	flake8 bin hg_agent_periodic tests setup.py
+	flake8
 
 test:
 	tox
@@ -52,4 +52,4 @@ dist: clean
 	ls -l dist
 
 install: clean
-	pip install .
+	pip install -r requirements.txt
