@@ -38,11 +38,6 @@ lint:
 test:
 	tox
 
-coverage:
-	coverage run --source hg_agent_periodic -m unittest discover -s tests
-	coverage report -m
-	coverage html
-
 release: clean
 	python2 setup.py --command-packages=stdeb.command sdist_dsc bdist_deb
 

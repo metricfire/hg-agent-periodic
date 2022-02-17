@@ -3,6 +3,8 @@ jobs:
   build:
     docker:
       - image: hostedgraphite/pythonbuild:hgapp_dep_xenial
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/artifacts
     steps:
       - checkout
       - run: apt-get update -y
@@ -10,6 +12,6 @@ jobs:
       - run: make install
       - run: make test
       - run: make lint
-      - run: make coverage
+      - run: cp -r cover $CIRCLE_ARTIFACTS
       - store_artifacts:
-          path: htmlcov
+          path: /tmp/artifacts
