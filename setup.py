@@ -17,7 +17,7 @@ requirements = [
 
 setup(
     name='hg-agent-periodic',
-    version='1.1.0',
+    version='1.1.1',
     description='Periodic tasks script for the Hosted Graphite agent.',
     long_description='Periodic tasks script for the Hosted Graphite agent.',
     author='Metricfire',
