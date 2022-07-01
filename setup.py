@@ -9,7 +9,7 @@ requirements = [
     'jsonschema==2.6.0',
     'requests==2.22.0',
     'rfc3987==1.3.7',  # For 'uri' format validation in jsonschema
-    'supervisor==3.3.1',
+    'supervisor==3.3.3',
     'tailer==0.4.1',
     'PyYAML==5.1.1',
     'wheel',
