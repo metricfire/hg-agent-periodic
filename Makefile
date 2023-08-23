@@ -31,6 +31,8 @@ clean-pyc:
 clean-test:
 	rm -f .coverage
 	rm -fr htmlcov/
+	rm -fr .tox/
+	rm -fr cover/
 
 lint:
 	flake8
