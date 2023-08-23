@@ -10,8 +10,8 @@ requirements = [
     'rfc3987<=1.3.8',  # For 'uri' format validation in jsonschema
     'supervisor<=4.2.4',
     'tailer<=0.4.1',
-    'PyYAML<=6.0',
-    'diamond @ git+ssh://git@github.com/hostedgraphite/Diamond.git@v5.0.0',
+    'PyYAML<=6.0.1',
+    'diamond @ git+ssh://git@github.com/hostedgraphite/Diamond.git@master',
 ]
 
 setup(
