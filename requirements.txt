@@ -7,9 +7,7 @@ importlib-resources==5.4.0
 Jinja2==3.0.3
 jsonschema==3.2.0
 MarkupSafe==2.0.1
-mock==4.0.3
 psutil==5.9.0
-pyfakefs==4.5.5
 pyrsistent==0.18.1
 PyYAML==6.0.1
 requests==2.27.1
