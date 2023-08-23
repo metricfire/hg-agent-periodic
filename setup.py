@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 requirements = [
     'Jinja2<=3.0.3',
     'jsonschema==3.2.0',
-    'requests<=2.27.1',
+    'requests<=2.31.0',
     'rfc3987<=1.3.8',  # For 'uri' format validation in jsonschema
     'supervisor<=4.2.4',
     'tailer<=0.4.1',
