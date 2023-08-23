@@ -14,13 +14,13 @@ def get_args(argv=None):
     '''Parse out and returns script args.'''
     description = 'Generate diamond config for `hg-agent`.'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Use debug logging.')
-    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf',
-                        help='Path to overall hg-agent config.')
-    parser.add_argument('--diamond-config',
-                        default='/var/opt/hg-agent/diamond.conf',
-                        help='Path to managed diamond config.')
+    parser.add_argument('--debug', action='store_true', default=False, help='Use debug logging.')
+    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf', help='Path to overall hg-agent config.')
+    parser.add_argument(
+        '--diamond-config',
+        default='/var/opt/hg-agent/diamond.conf',
+        help='Path to managed diamond config.'
+    )
     args = parser.parse_args(args=argv)
     return args
 
@@ -31,7 +31,7 @@ def main():
 
     try:
         data = periodic.load_file(args.config)
-        agent_config = yaml.load(data)
+        agent_config = yaml.safe_load(data)
         periodic.validate_agent_config(agent_config)
         new_diamond = periodic.gen_diamond_config(agent_config)
         with open(args.diamond_config, 'w') as f:

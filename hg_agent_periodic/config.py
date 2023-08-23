@@ -14,22 +14,12 @@ def get_args(argv=None):
     '''Parse out and returns script args.'''
     description = 'Generate config for `hg-agent`.'
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--debug', action='store_true', default=False,
-                        help='Use debug logging.')
-    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf',
-                        help='Path to hg-agent config.')
-    parser.add_argument('--api-key',
-                        default='00000000-0000-0000-0000-000000000000',
-                        help='Hosted Graphite API key.')
-    parser.add_argument('--endpoint',
-                        default='localhost',
-                        help='HG Agent local Graphite endpoint.')
-    parser.add_argument('--endpoint-url',
-                        default='',
-                        help='Hosted Graphite sink API endpoint.')
-    parser.add_argument('--heartbeat-url',
-                        default='',
-                        help='Hosted Graphite heartbeat metadata endpoint.')
+    parser.add_argument('--debug', action='store_true', default=False, help='Use debug logging.')
+    parser.add_argument('--config', default='/etc/opt/hg-agent/hg-agent.conf', help='Path to hg-agent config.')
+    parser.add_argument('--api-key', default='00000000-0000-0000-0000-000000000000', help='Hosted Graphite API key.')
+    parser.add_argument('--endpoint', default='localhost', help='HG Agent local Graphite endpoint.')
+    parser.add_argument('--endpoint-url', default='', help='Hosted Graphite sink API endpoint.')
+    parser.add_argument('--heartbeat-url', default='', help='Hosted Graphite heartbeat metadata endpoint.')
     args = parser.parse_args(args=argv)
     return args
 

@@ -1,14 +1,28 @@
 version: 2.0
 jobs:
-  build:
+  test:
     docker:
-      - image: hostedgraphite/pythonbuild:2venv
+      - image: hostedgraphite/pythonbuild:focal_build3
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/artifacts
     steps:
       - checkout
+      - run: mkdir -p $CIRCLE_ARTIFACTS
+      - run: virtualenv periodic-env
+      - run: echo "source periodic-env/bin/activate" >> $BASH_ENV
       - run: make install
       - run: make test
-      - run: pip install flake8 coverage httmock mock pyfakefs
       - run: make lint
-      - run: make coverage
+      - run: cp -r cover $CIRCLE_ARTIFACTS
       - store_artifacts:
-          path: htmlcov
+          path: /tmp/artifacts
+      - save_cache:
+          key: dep-pip-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "/root/.cache"
+
+workflows:
+  version: 2
+  default:
+    jobs:
+      - test

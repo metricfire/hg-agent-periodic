@@ -31,12 +31,14 @@ clean-pyc:
 clean-test:
 	rm -f .coverage
 	rm -fr htmlcov/
+	rm -fr .tox/
+	rm -fr cover/
 
 lint:
-	flake8 bin/* hg_agent_periodic tests
+	flake8
 
 test:
-	python setup.py test
+	tox
 
 coverage:
 	coverage run --source hg_agent_periodic -m unittest discover -s tests
@@ -44,12 +46,12 @@ coverage:
 	coverage html
 
 release: clean
-	python setup.py --command-packages=stdeb.command sdist_dsc bdist_deb
+	python3 setup.py --command-packages=stdeb.command sdist_dsc bdist_deb
 
 dist: clean
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python3 setup.py sdist
+	python3 setup.py bdist_wheel
 	ls -l dist
 
 install: clean
-	python setup.py install
+	pip install -r requirements.txt

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import collections
@@ -23,16 +23,16 @@ from hg_agent_periodic import periodic
 class TestConfigSchema(unittest.TestCase):
 
     def test_barestring(self):
-        y = yaml.load('bare string')
+        y = yaml.safe_load('bare string')
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_ok(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
 
     def test_ok_proxy(self):
@@ -40,7 +40,7 @@ class TestConfigSchema(unittest.TestCase):
             api_key: "00000000-0000-0000-0000-000000000000"
             https_proxy: "http://10.10.1.10:1080"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
 
     def test_unknown_key(self):
@@ -48,67 +48,67 @@ class TestConfigSchema(unittest.TestCase):
             api_key: "00000000-0000-0000-0000-000000000000"
             something: "whatever"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_missing_required_key(self):
         cfg = '''
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_bad_api_key(self):
         cfg = '''
             api_key: "not a uuidv4"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_bad_endpoint(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             endpoint: "not a hostname"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_bad_endpoint_url(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             endpoint_url: "not a URL"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_bad_proxy(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             https_proxy: "not a proxy URI"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
     def test_spelling(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             ednpoint: "a.carbon.endpoint"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         with self.assertRaises(periodic.ValidationError) as cm:
             periodic.validate_agent_config(y)
-        print cm.exception.message
+        print(cm.exception)
 
 
 class TestDiamondConfigGen(unittest.TestCase):
@@ -117,34 +117,30 @@ class TestDiamondConfigGen(unittest.TestCase):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
         self.assertIn('host = localhost', lines)
-        self.assertIn(
-            'path_prefix = hg_agent',
-            lines)
+        self.assertIn('path_prefix = hg_agent', lines)
 
     def test_custom_prefix(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             custom_prefix: "no_2_hg_agent"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
-        self.assertIn(
-            'path_prefix = no_2_hg_agent',
-            lines)
+        self.assertIn('path_prefix = no_2_hg_agent', lines)
 
     def test_hostname_method(self):
         cfg = '''
             api_key: "00000000-0000-0000-0000-000000000000"
             hostname_method: "fqdn"
         '''
-        y = yaml.load(textwrap.dedent(cfg))
+        y = yaml.safe_load(textwrap.dedent(cfg))
         periodic.validate_agent_config(y)
         diamond = periodic.gen_diamond_config(y)
         lines = diamond.split('\n')
@@ -162,11 +158,9 @@ class TestDiamondConfigGen(unittest.TestCase):
                                   Some other line''')
 
         self.assertFalse(
-            periodic.generated_configs_differ(cfg1, cfg2,
-                                              ignore='ignore'))
+            periodic.generated_configs_differ(cfg1, cfg2, ignore='ignore'))
         self.assertTrue(
-            periodic.generated_configs_differ(cfg1, cfg3,
-                                              ignore='ignore'))
+            periodic.generated_configs_differ(cfg1, cfg3, ignore='ignore'))
 
 
 ConfigArgs = collections.namedtuple('ConfigArgs', ['config', 'diamond_config'])
@@ -189,11 +183,13 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.gen_diamond_config')
     def test_config_invalid(self, mock_gen, mock_logging):
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                               invalid_key: "test"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''
+                api_key: "00000000-0000-0000-0000-000000000000"
+                invalid_key: "test"
+            ''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
 
         # If validation fails, we never reach gen.
@@ -208,10 +204,10 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         # note its functionality is tested in TestDiamondConfigGen above).
         mock_gen.return_value = 'a fake diamond config\n'
 
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
 
         self.assertFalse(os.path.exists('/diamond.cfg'))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
@@ -224,12 +220,12 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
 
         old_diamond = 'a fake diamond config\n'
         mock_gen.return_value = old_diamond
-        self.fs.CreateFile('/diamond.cfg', contents=old_diamond)
+        self.fs.create_file('/diamond.cfg', contents=old_diamond)
 
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
 
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_not_called()
@@ -239,10 +235,10 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_no_endpoint_url(self, mock_gen, mock_restart):
         '''The forwarder is not restarted without `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_called_once_with(mock.ANY, 'diamond')
@@ -252,11 +248,13 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_unchanged_endpoint_url(self, mock_gen, mock_restart):
         '''The forwarder is not restarted with unchanged `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint_url: "https://my-endpoint"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''
+                api_key: "00000000-0000-0000-0000-000000000000"
+                endpoint_url: "https://my-endpoint"
+            ''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_called_once_with(mock.ANY, 'diamond')
@@ -266,17 +264,21 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_changed_endpoint_url(self, mock_gen, mock_restart):
         '''The forwarder/receiver are restarted with changed `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint_url: "https://my-endpoint"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''
+                api_key: "00000000-0000-0000-0000-000000000000"
+                endpoint_url: "https://my-endpoint"
+            ''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         config = self.fs.get_object('/hg-agent.cfg')
-        config.set_contents(textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                               endpoint_url: "https://other-endpoint"
-                            '''))
+        config.set_contents(
+            textwrap.dedent('''
+               api_key: "00000000-0000-0000-0000-000000000000"
+               endpoint_url: "https://other-endpoint"
+            ''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_any_call(mock.ANY, 'forwarder')
         mock_restart.assert_any_call(mock.ANY, 'receiver')
@@ -286,10 +288,10 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_unchanged_api_key(self, mock_gen, mock_restart):
         '''The forwarder is not restarted with unchanged `api_key`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_called_once_with(mock.ANY, 'diamond')
@@ -299,15 +301,13 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_changed_api_key(self, mock_gen, mock_restart):
         '''The forwarder/receiver are restarted with changed `api_key`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         config = self.fs.get_object('/hg-agent.cfg')
-        config.set_contents(textwrap.dedent('''
-                               api_key: "10000000-0000-0000-0000-000000000001"
-                            '''))
+        config.set_contents(textwrap.dedent('''api_key: "10000000-0000-0000-0000-000000000001"'''))
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_restart.assert_any_call(mock.ANY, 'forwarder')
         mock_restart.assert_any_call(mock.ANY, 'receiver')
@@ -317,10 +317,10 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
     def test_config_new_endpoint_url(self, mock_gen, mock_restart):
         '''The forwarder is restarted with an entirely new `endpoint_url`'''
         mock_gen.return_value = 'a fake diamond config\n'
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         config = self.fs.get_object('/hg-agent.cfg')
         config.set_contents(textwrap.dedent('''
@@ -337,18 +337,16 @@ class TestConfigOnce(fake_filesystem_unittest.TestCase):
         mock_gen.return_value = 'a fake diamond config\n'
         mock_restart.side_effect = Exception('test')
 
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
 
         periodic.config_once(ConfigArgs('/hg-agent.cfg', '/diamond.cfg'))
         mock_logging.exception.assert_called()
 
 
-HeartbeatArgs = collections.namedtuple('HeartbeatArgs',
-                                       ['config', 'agent_version',
-                                        'periodic_logfile', 'heartbeat'])
+HeartbeatArgs = collections.namedtuple('HeartbeatArgs', ['config', 'agent_version', 'periodic_logfile', 'heartbeat'])
 
 
 # httmock setup
@@ -382,11 +380,10 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
         try:
             socket.inet_aton(a)
         except socket.error:
-            self.fail('address from get_primary_ip does not parse '
-                      'properly: %s' % a)
+            self.fail('address from get_primary_ip does not parse properly: %s' % a)
 
     def test_get_version(self):
-        self.fs.CreateFile('/version', contents='0.1\n')
+        self.fs.create_file('/version', contents='0.1\n')
         result = periodic.get_version('/nonexistent')
         self.assertEqual(None, result)
         result = periodic.get_version('/version')
@@ -394,7 +391,7 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
 
     def test_collect_logs(self):
         data = ['line %.02d' % i for i in range(20)]
-        self.fs.CreateFile('/test.log', contents='\n'.join(data) + '\n')
+        self.fs.create_file('/test.log', contents='\n'.join(data) + '\n')
 
         result = periodic.collect_logs('/nonexistent.log')
         self.assertEqual([], result)
@@ -405,8 +402,7 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.validate_agent_config')
     def test_config_load_error(self, mock_validate, mock_logging):
-        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log',
-                             'endpoint')
+        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log', 'endpoint')
         periodic.heartbeat_once(args)
         mock_logging.error.assert_called()
         # If load fails, we never reach validate
@@ -415,13 +411,14 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.get_version')
     def test_config_invalid(self, mock_version, mock_logging):
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                               invalid_key: "test"
-                           '''))
-        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log',
-                             'endpoint')
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''
+                api_key: "00000000-0000-0000-0000-000000000000"
+                invalid_key: "test"
+            ''')
+        )
+        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log', 'endpoint')
         periodic.heartbeat_once(args)
 
         # If validation fails, we never reach version.
@@ -431,12 +428,11 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.logging')
     @mock.patch('hg_agent_periodic.periodic.collect_logs')
     def test_version_invalid(self, mock_collect, mock_logging):
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
-        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log',
-                             'endpoint')
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
+        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log', 'endpoint')
         periodic.heartbeat_once(args)
 
         # If version fails, we never reach collect_logs.
@@ -446,15 +442,14 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
     @mock.patch('hg_agent_periodic.periodic.send_heartbeat')
     @mock.patch('hg_agent_periodic.periodic.platform')
     def test_heartbeat(self, mock_platform, mock_send):
-        self.fs.CreateFile('/hg-agent.cfg',
-                           contents=textwrap.dedent('''
-                               api_key: "00000000-0000-0000-0000-000000000000"
-                           '''))
-        self.fs.CreateFile('/version', contents='0.1\n')
+        self.fs.create_file(
+            '/hg-agent.cfg',
+            contents=textwrap.dedent('''api_key: "00000000-0000-0000-0000-000000000000"''')
+        )
+        self.fs.create_file('/version', contents='0.1\n')
         data = ['line %.02d' % i for i in range(20)]
-        self.fs.CreateFile('/test.log', contents='\n'.join(data) + '\n')
-        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log',
-                             'endpoint')
+        self.fs.create_file('/test.log', contents='\n'.join(data) + '\n')
+        args = HeartbeatArgs('/hg-agent.cfg', '/version', '/test.log', 'endpoint')
         periodic.heartbeat_once(args)
         mock_platform.platform.assert_called()
         mock_send.assert_called()
@@ -492,17 +487,12 @@ class TestHeartbeatOnce(fake_filesystem_unittest.TestCase):
         mock_response = mock.MagicMock(requests.Response)
         mock_requests.put.return_value = mock_response
         periodic.send_heartbeat('endpoint', '{"fake": "json"}')
-        mock_requests.put.assert_called_once_with(mock.ANY,
-                                                  json=mock.ANY,
-                                                  timeout=mock.ANY)
+        mock_requests.put.assert_called_once_with(mock.ANY, json=mock.ANY, timeout=mock.ANY)
 
         mock_requests.reset_mock()
         periodic.send_heartbeat('endpoint', '{"fake": "json"}',
                                 proxies={'https': 'dummy'})
-        mock_requests.put.assert_called_once_with(mock.ANY,
-                                                  json=mock.ANY,
-                                                  timeout=mock.ANY,
-                                                  proxies={'https': 'dummy'})
+        mock_requests.put.assert_called_once_with(mock.ANY, json=mock.ANY, timeout=mock.ANY, proxies={'https': 'dummy'})
 
 
 class TestMiscFunctions(unittest.TestCase):
